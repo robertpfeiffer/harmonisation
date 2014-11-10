@@ -1,0 +1,5 @@
+*~
+*.pyc
+*.exe
+*.bak
+.DS_Store
