@@ -23,11 +23,11 @@ class Chord(object):
     def _normalize(self):
         self._notes = {x % 12 for x in self._notes}
     
-    def containsNote(self, note):
+    def contains_note(self, note):
         """Tests, wheather the Chord contains the Note"""
         return note in self._notes
 
-    def getNotes(self):
+    def get_notes(self):
         self._normalize()
         notes = list(self._notes)
         notes.sort()
