@@ -1,0 +1,70 @@
+{
+    name: "dummy",
+    description: "A basic dummy style",
+    progressions: [
+        {
+            //T->T
+            weight: 1,
+            chords: [
+                [0,4,7],
+                [0,4,7]
+            ]
+        }, {
+            //D->D
+            weight: 1,
+            chords: [
+                [2,7,11],
+                [2,7,11]
+            ]
+        }, {
+            //S->S
+            weight: 1,
+            chords: [
+                [0,5,9],
+                [0,5,9]
+            ]
+        }, {
+            //T->S
+            weight: 3,
+            chords: [
+                [0,4,7],
+                [0,5,9]
+            ]
+        }, {
+            //S->T
+            weight: 2,
+            chords: [
+                [0,5,9],
+                [0,4,7]
+            ]
+        }, {
+            //T->D
+            weight: 2,
+            chords: [
+                [0,4,7],
+                [2,7,11]
+            ]
+        }, {
+            //D->T
+            weight: 4,
+            chords: [
+                [2,7,11],
+                [0,4,7]
+            ]
+        }, {
+            //S->D
+            weight: 3,
+            chords: [
+                [0,5,9],
+                [2,7,11]
+            ]
+        }, {
+            //D->S
+            weight: 2,
+            chords: [
+                [2,7,11],
+                [0,5,9]
+            ]
+        }
+    ]
+}
