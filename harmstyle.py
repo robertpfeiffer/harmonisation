@@ -24,7 +24,7 @@ class Chord(object):
         self._notes = {x % 12 for x in self._notes}
     
     def contains_note(self, note):
-        """Tests, wheather the Chord contains the Note"""
+        """Tests whether the Chord contains the Note"""
         return note in self._notes
 
     def get_notes(self):
