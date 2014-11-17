@@ -13,7 +13,7 @@ class IOUtils(object):
             for chord in progression['chords']:
                 chords.append(Chord(chord))
             
-            progressions.append(ChordProgression(progression['weight'], chords))
+            progressions.append(ChordProgression(progression['weight'], chords,progression["description"]))
         
         return HarmonicStyle(data['name'], data['description'], progressions)
 
@@ -22,5 +22,5 @@ class IOUtils(object):
         with open(filepath) as data_file:    
             data = json.load(data_file)
         
-        pprint(data)
+        #pprint(data)
         return IOUtils().harmonic_style_from_JSON(data)

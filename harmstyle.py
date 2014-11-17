@@ -9,9 +9,10 @@ class HarmonicStyle(object):
 class ChordProgression(object):
     """A single Chord Progession"""
     
-    def __init__(self, weight, chords):
+    def __init__(self, weight, chords, description):
         self.weight = weight
         self.chords = chords
+        self.description = description
 
 class Chord(object):
     """A set of simultaneous notes"""

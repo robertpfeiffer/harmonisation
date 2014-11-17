@@ -15,9 +15,9 @@ class RandomCreativity(object):
 
     def randomize_progression(self, progression):
         """Takes a ChordProgression and applies some random changes to it"""
-        new_weight = random.gauss(progression.weight, self._sigma_factor*progression.weight)
+        new_weight = random.gauss(progression.weight, self._sd_factor*progression.weight)
         new_chords = list(map(self.randomize_chord, progression.chords))
-        return ChordProgression(new_weight, new_chords)
+        return ChordProgression(new_weight, new_chords, description="NA")
 
     def randomize_chord(self, chord):
         """Takes a Chord and applies some random changes to it"""
