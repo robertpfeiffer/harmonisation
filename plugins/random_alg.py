@@ -1,5 +1,6 @@
 from harmstyle import HarmonicStyle, ChordProgression, Chord
 import random
+import registry
 
 class RandomCreativity(object):
     """A randomly (not really) creative style developer"""
@@ -29,3 +30,5 @@ class RandomCreativity(object):
                 else:
                     new_notes.add(i)
         return Chord(new_notes)
+
+registry.register(RandomCreativity)
