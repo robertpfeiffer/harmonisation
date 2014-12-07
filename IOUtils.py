@@ -24,3 +24,12 @@ class IOUtils(object):
         
         #pprint(data)
         return IOUtils().harmonic_style_from_JSON(data)
+        
+    @staticmethod
+    def JSON_file_from_harmonic_style(style, filepath):
+        with open(filepath, "w") as data_file:
+            json.dump(IOUtils().JSON_from_harmonic_style(style), data_file)
+    
+    @staticmethod
+    def JSON_from_harmonic_style(style):
+        return dict(style)
