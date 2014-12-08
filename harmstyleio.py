@@ -3,7 +3,7 @@ from harmstyle import HarmonicStyle, ChordProgression, Chord
 import json
 from pprint import pprint
 
-class IOUtils(object):
+class HarmonicStyleIO(object):
     
     @staticmethod
     def harmonic_style_from_JSON(data):
@@ -23,13 +23,24 @@ class IOUtils(object):
             data = json.load(data_file)
         
         #pprint(data)
-        return IOUtils().harmonic_style_from_JSON(data)
+        return HarmonicStyleIO.harmonic_style_from_JSON(data)
         
     @staticmethod
     def JSON_file_from_harmonic_style(style, filepath):
         with open(filepath, "w") as data_file:
-            json.dump(IOUtils().JSON_from_harmonic_style(style), data_file)
+            json.dump(HarmonicStyleIO.JSON_from_harmonic_style(style), data_file)
     
     @staticmethod
     def JSON_from_harmonic_style(style):
-        return dict(style)
+        progressions = []
+        for progression in style.progressions:
+            chords = []
+            for chord in progression.chords:
+                chords.append(chord.get_notes())
+            progressions.append({
+                'weight': progression.weight,
+                'description': progression.description,
+                'chords': chords
+            })
+        data = {'name': style.name, 'description': style.description, 'progressions': progressions}
+        return data

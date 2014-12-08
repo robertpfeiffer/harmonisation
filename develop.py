@@ -1,9 +1,10 @@
 import sys
 import registry
 from plugins import *
-import IOUtils
+from harmstyleio import HarmonicStyleIO
 
 if __name__=="__main__":
-    style=IOUtils.load_style_file(sys.argv[1])
-    mutate=registry.get(sys.argv[2])
-    mutate.develop(style)
+    style=HarmonicStyleIO.harmonic_style_from_JSON_file(sys.argv[1])
+    mutate=registry.get(sys.argv[3])
+    new_style=mutate.develop(style)
+    HarmonicStyleIO.JSON_file_from_harmonic_style(new_style, sys.argv[2])
