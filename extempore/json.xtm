@@ -1,0 +1,311 @@
+;;;
+;;;; JSON reader and writer
+;;;
+;;
+;; @created   "Wed Feb 14 15:30:07 EST 2007"
+;; @copyright "NuEcho Inc."
+;;
+
+;; adapted for extempore / tinyscheme by Christoph Finkensiep <chfin@freenet.de>
+
+;; (package* json/v1.0.1
+;;   (provide: 
+;;    (define* (json-read (port _)))
+;;    (define* (json-write value _)))
+
+;;   (maintainer: "Dominique Boucher (SchemeWay) <schemeway at sympatico.ca>")
+;;   (author: "Dominique Boucher (SchemeWay) <schemeway at sympatico.ca>")
+;;   (homepage: "http://schemeway.dyndns.org/Snowballs/snowballs.html")
+;;   (description: "JSON reader and writer")
+;;   (keywords: parsing conv)
+;;   (license: cpl/v1.0))
+
+;; make stuff work
+
+(define (raise foo)
+  (print "Error: ")
+  (println foo))
+
+;; objects
+;; A very simple and stupid implementation of objects
+
+(define %json-object-closure
+  (let ((object-sym (gensym)))
+    (lambda (cue . args)
+      (case cue
+        ((make-object)
+         (list object-sym))
+        ((object?)
+         (and (list? (car args)) (eq? (caar args) object-sym)))
+        ((object-set!)
+         (let ((object (car args))
+               (key (cadr args))
+               (value (caddr args)))
+           (set-cdr! object
+                     (cons (cons key value)
+                           (cl:remove-if (lambda (pair)
+                                           (equal? key (car pair)))
+                                         (cdr object))))))
+        ((to-alist)
+         (cdar args))))))
+
+(define (make-json-object)
+  (%json-object-closure 'make-object))
+
+(define (json-object? object)
+  (%json-object-closure 'object? object))
+
+(define (json-object-set! object key value)
+  (%json-object-closure 'object-set! object key value))
+
+(define (json-object-to-alist object)
+  (%json-object-closure 'to-alist object))
+
+(define (json-object-get object key)
+  (let ((elt (assoc key (json-object-to-alist object))))
+    (if (pair? elt)
+        (cdr elt)
+        elt)))
+
+(define (json-object-for-each fn object)
+  (let ((alist (object-to-alist object)))
+    (for-each (lambda (pair) (fn (car pair) (cdr pair))) alist)))
+
+
+;;;
+;;;; --
+;;;; Some constants
+;;;
+
+
+(define json-null (vector 'json-null))
+
+(define (json-null? obj)
+  (eq? obj json-null))
+
+;;;;;;;;;;;;;;;;
+;;;; Reader ;;;;
+;;;;;;;;;;;;;;;;
+
+(define (json-read port)
+  (define lookahead (peek-char port))
+  
+  (define (consume)
+    (read-char port)
+    (set! lookahead (peek-char port)))
+
+  (define (match-char ch message consume?)
+    (if (not (eqv? lookahead ch))
+        (error message)
+        (if consume?
+            (consume))))
+
+  (define (skip-ws)
+    (if (char-whitespace? lookahead)
+        (begin
+          (consume)
+          (skip-ws))))
+  
+  (define (read-object)
+    (let ((object (make-json-object)))
+      (match-char #\{ "object must begin with a '{'" #t)
+      (skip-ws)
+      (if (eqv? lookahead #\})
+          (begin
+            (consume)
+            object)
+          (let loop ((loopvar '()))
+            (let ((key (read-value)))
+              (if (not (string? key))
+                  (error "key must be a string"))
+              (skip-ws)
+              (match-char #\: "key must be following by ':'" #t)
+              (let ((value (read-value)))
+                (json-object-set! object key value)
+                (skip-ws)
+                (if (eqv? lookahead #\,)
+                    (begin
+                      (consume)
+                      (loop '()))
+                    (begin
+                      (match-char #\} "object must be terminated by '}'" #t)
+                      object))))))))
+
+  (define (read-array)
+    (match-char #\[ "array must begin with a '['" #t)
+    (skip-ws)
+    (if (eqv? lookahead #\])
+        (begin (consume) '())
+        (let loop ((elements (list (read-value))))
+          (skip-ws)
+          (cond ((eqv? lookahead #\])
+                 (consume)
+                 (reverse elements))
+                ((eqv? lookahead #\,)
+                 (consume)
+                 (loop (cons (read-value) elements)))
+                (else
+                 (println lookahead)
+                 (raise 'invalid-json-array))))))
+
+  (define (read-string)
+    (match-char #\" "string must begin with a double quote" #f)
+    (let ((str (read port)))
+      (set! lookahead (peek-char port))
+      str))
+
+  (define (read-number)
+    (let ((op (open-output-string)))
+      ;; optional minus sign
+      (if (eqv? lookahead #\-)
+          (begin
+            (consume)
+            (write-char #\- op)))
+      ;; integral part
+      (cond ((eqv? lookahead #\0)
+             (consume)
+             (write-char #\0 op))
+            ((and (char? lookahead) (char-numeric? lookahead))
+             (let loop ((something '()))
+               (write-char lookahead op)
+               (consume)
+               (if (and (char? lookahead) (char-numeric? lookahead))
+                   (loop '()))))
+            (else
+             (raise 'invalid-json-number)))
+      (if (eqv? lookahead #\.)
+          (begin
+            (write-char #\. op)
+            (consume)
+            (if (and (char? lookahead) (char-numeric? lookahead))
+                (let loop ((something '()))
+                  (write-char lookahead op)
+                  (consume)
+                  (if (and (char? lookahead) (char-numeric? lookahead))
+                      (loop '())
+                      ;;  e | E
+                      (if (or (eqv? lookahead #\e) (eqv? lookahead #\E))
+                          (begin
+                            (write-char lookahead op)
+                            (consume)
+                            ;; [ + | - ]
+                            (if (or (eqv? lookahead #\+) (eqv? lookahead #\-))
+                                (begin
+                                  (write-char lookahead op)
+                                  (consume)))
+                            ;; digit+
+                            (if (and (char? lookahead) (char-numeric? lookahead))
+                                (let loop ((something '()))
+                                  (write-char lookahead op)
+                                  (consume)
+                                  (if (and (char? lookahead) (char-numeric? lookahead))
+                                      (loop '())))
+                                (raise 'invalid-json-number))))))
+                (raise 'invalid-json-number))))
+      (let* ((ip (open-input-string (get-output-string op)))
+             (num (read ip)))
+        (close-port ip)
+        (close-port op)
+        num)))
+
+  (define (read-constant)
+    (let loop ((chars '()))
+      (if (and (not (eof-object? lookahead))
+               (char-alphabetic? lookahead))
+          (let ((ch lookahead))
+            (consume)
+            (loop (cons ch chars)))
+          (let ((str (list->string (reverse chars))))
+            (cond ((string=? str "false") #f)
+                  ((string=? str "true")  #t)
+                  ((string=? str "null")  json-null)
+                  (else                   (raise 'invalid-json-constant)))))))
+
+  (define (read-value)
+    (skip-ws)
+    (cond ((eof-object? lookahead)
+           (raise 'unexpected-eof))
+          ((char=? lookahead #\{)
+           (read-object))
+          ((char=? lookahead #\[)
+           (read-array))
+          ((char=? lookahead #\")
+           (read-string))
+          ((or (char-numeric? lookahead) (char=? lookahead #\-))
+           (read-number))
+          ((char-alphabetic? lookahead)
+           (read-constant))
+          (else
+           (raise 'json-syntax-error))))
+
+  (read-value))
+
+;;;;;;;;;;;;;;;;
+;;;; Writer ;;;;
+;;;;;;;;;;;;;;;;
+
+(define (json-write value port)
+  
+  (define (write-object object)
+    (write-char #\{ port)
+    (let ((first? #t))
+      (json-object-for-each (lambda (key value)
+                        (if (not (string? key))
+                            (raise 'invalid-json-object))
+                        (if (not first?)
+                            (display ", " port))
+                        (write key port)
+                        (display ": ")
+                        (write-value value)
+                        (set! first? #f))
+                      object))
+    (write-char #\} port))
+  
+  (define (write-array elements)
+    (write-char #\[)
+    (let ((first? #t))
+      (for-each (lambda (value)
+                  (if (not first?)
+                      (display ", " port))
+                  (write-value value)
+                  (set! first? #f))
+                elements))
+    (write-char #\]))
+  
+  (define (write-string str)
+    (write str port))
+  
+  (define (write-number num)
+    (let ((str (number->string (exact->inexact num))))
+      (if (char=? (string-ref str 0) #\.)
+          (begin
+            (display "0" port)
+            (display str port))
+          (if (char=? (string-ref str (- (string-length str) 1)) #\.)
+              (display (substring str 0 (- (string-length str) 1)) port)
+              (display str port)))))
+  
+  (define (write-constant value)
+    (cond ((eqv? value #f)
+           (display "false" port))
+          ((eqv? value #t)
+           (display "true" port))
+          ((json-null? value)
+           (display "null" port))
+          (else
+           (pp value)
+           (raise 'invalid-json-object))))
+  
+  (define (write-value value)
+    (cond ((json-object? value)
+           (write-object value))
+          ((list? value)
+           (write-array value))
+          ((real? value)
+           (write-number value))
+          ((string? value)
+           (write-string value))
+          (else
+           (write-constant value))))
+  
+  (write-value value))

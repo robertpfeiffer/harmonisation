@@ -1,0 +1,38 @@
+;;;;;;;;;;;;;;;;;;;;;
+;;;; drumkit.xtm ;;;;
+;;;;;;;;;;;;;;;;;;;;;
+;; Defines a pizz bass sampler.
+;; Download the pizzicato bass samples from freesound [1] and adapt the `load-sampler` call
+;; to use the corresponding directory containing the wav files.
+;; [1] https://www.freesound.org/people/Carlos_Vaquero/packs/9528/
+
+(sys:load "libs/external/instruments_ext.xtm")
+
+(define pizz-bass-path )
+
+(define-sampler pizz-bass sampler_note_hermite_c sampler_fx)
+
+(define parse-vaquero-pizz-bass
+  (lambda (file-list)
+    (map (lambda (fname)
+           (let ((result (regex:matched fname "^.*([abcdefg][#b]?[0-9]).wav$")))
+             (if (null? result)
+                 #f
+                 (list fname
+                       (note-name-to-midi-number (cadr result))
+                       0                 
+                       0))))
+         file-list)))
+
+(load-sampler pizz-bass
+              "/path/to/vaquero_double_bass_single_pizz/"
+              0
+              parse-vaquero-pizz-bass)
+
+;; (bind-func dsp:DSP
+;;   (lambda (in time chan dat)
+;;     (cond ((< chan 2)
+;;            (pizz-bass in time chan dat))
+;;           (else 0.0))))
+
+;; (play-note (now) pizz-bass 52 127 *second*)

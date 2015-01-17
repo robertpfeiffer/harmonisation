@@ -1,0 +1,32 @@
+;;;;;;;;;;;;;;;;;;;
+;;;; piano.xtm ;;;;
+;;;;;;;;;;;;;;;;;;;
+;; Defines a piano sampler, taken from [1].
+;; Download the salamander piano [2] and adapt the `load-sampler` call
+;; to use the corresponding directory containing the wav files.
+;; [1] http://benswift.me/2012/10/17/loading-and-using-a-sampler/
+;; [2] http://download.linuxaudio.org/lau/SalamanderGrandPianoV2/SalamanderGrandPianoV2_44.1khz16bit.tar.bz2
+
+(sys:load "libs/external/instruments_ext.xtm")
+
+(define-sampler piano sampler_note_hermite_c sampler_fx)
+
+(define parse-salamander-piano
+  (lambda (file-list)
+    (map (lambda (fname)
+           (let ((result (regex:matched fname "^.*([ABCDEFG][#b]?[0-9])v([0-9]+)\.(wav|aif|aiff|ogg)$")))
+             (if (null? result)
+                 #f
+                 ;; load 4th velocity layer only
+                 (if (= (string->number (caddr result)) 4)
+                     (list fname
+                           (note-name-to-midi-number (cadr result))
+                           0                 
+                           0)
+                     #f))))
+         file-list)))
+
+(load-sampler piano
+              "/path/to/salamander_piano/44.1khz16bit/"
+              0
+              parse-salamander-piano)

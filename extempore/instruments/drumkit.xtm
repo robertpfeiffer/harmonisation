@@ -1,0 +1,29 @@
+;;;;;;;;;;;;;;;;;;;;;
+;;;; drumkit.xtm ;;;;
+;;;;;;;;;;;;;;;;;;;;;
+;; Defines a drumkit sampler, taken from [1].
+;; Download the salamander drumkit [2] and point `drum-path`
+;; to the corresponding directory containing the wav files.
+;; [1] http://benswift.me/2012/10/17/loading-and-using-a-sampler/
+;; [2] https://archive.org/download/SalamanderDrumkit/salamanderDrumkit.tar.bz2
+
+(sys:load "libs/external/instruments_ext.xtm")
+
+(define drum-path "/path/to/salamander_drumkit/OH/")
+
+(define-sampler drums sampler_note_hermite_c sampler_fx)
+
+(set-sampler-index drums (string-append drum-path "kick_OH_F_9.wav") *gm-kick* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "snareStick_OH_F_9.wav") *gm-side-stick* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "snare_OH_FF_9.wav") *gm-snare* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "hihatClosed_OH_F_20.wav") *gm-closed-hi-hat* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "hihatFoot_OH_MP_12.wav") *gm-pedal-hi-hat* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "hihatOpen_OH_FF_6.wav") *gm-open-hi-hat* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "loTom_OH_FF_8.wav") *gm-low-floor-tom* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "hiTom_OH_FF_9.wav") *gm-hi-floor-tom* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "crash1_OH_FF_6.wav") *gm-crash* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "ride1_OH_FF_4.wav") *gm-ride* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "china1_OH_FF_8.wav") *gm-chinese* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "cowbell_FF_9.wav") *gm-cowbell* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "bellchime_F_3.wav") *gm-open-triangle* 0 0 0 1)
+(set-sampler-index drums (string-append drum-path "ride1Bell_OH_F_6.wav") *gm-ride-bell* 0 0 0 1)

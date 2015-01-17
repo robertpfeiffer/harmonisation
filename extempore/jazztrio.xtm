@@ -1,0 +1,272 @@
+;; jazztrio.xtm
+;; a jazz trio that plays chord progression with extempore
+;;
+;; - put json.xtm and instruments/ in $EXTEMPORE_DIR/libs/user/
+;; - adapt the path to the style to load (bottom, `load-style`)
+;; - eval this file
+;; - controls at the bottom
+
+;;;;;;;;;;;;;;;
+;;;; setup ;;;;
+;;;;;;;;;;;;;;;
+
+;;; load libraries
+;;;;;;;;;;;;;;;;;;
+
+;; (define local-path "/home/chfin/Uni/ws1415/harm/repo/extempore/")
+;; (define local-path "/home/chfin/dateien/dev/extempore/")
+
+;; (define (load-local file)
+;;   (sys:load (string-append local-path file)))
+
+(sys:load "libs/user/instruments/pizz-bass.xtm")
+(sys:load "libs/user/instruments/drumkit.xtm")
+(sys:load "libs/user/instruments/piano.xtm")
+(sys:load "libs/core/pc_ivl.xtm")
+(sys:load "libs/user/json.xtm")
+
+;;; dsp setup
+;;;;;;;;;;;;;
+
+;; play instruments
+(bind-func dsp:DSP
+  (let ((mute #f))
+    (lambda (in time chan dat)
+      (let ((val:float
+             (if (< chan 2)
+                 (* 5.0
+                    (+ (pizz-bass in time chan dat)
+                       (* .5 (drums in time chan dat))
+                       (piano in time chan dat)))
+                 0.0)))
+        (if mute 0.0 val)))))
+
+;; dsp control functions
+(bind-func mute (lambda () (dsp.mute #t)))
+(bind-func unmute (lambda () (dsp.mute #f) #t))
+
+;; set dsp function
+(dsp:set! dsp)
+
+;;; metronome
+;;;;;;;;;;;;;
+
+;; create a new metronome
+(define *metro* (make-metro 120))
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;;; json loading ;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+;; loads a json file
+(define (load-json-file filename)
+  (let* ((in (open-input-file filename))
+         (json (json-read in)))
+    (close-port in)
+    json))
+
+;; matrix for the current style
+(define *style*)
+
+;; loads a style file (uses load-json-file)
+(define (load-style filename)
+  (set! *style*
+        (let ((style (load-json-file filename)))
+          (print "Loading style: ")
+          (println (json-object-get style "name"))
+          (map (lambda (prog-obj)
+                 (cons (json-object-get prog-obj "weight")
+                       (json-object-get prog-obj "chords")))
+               (json-object-get style "progressions"))))
+  (print "Loaded style: ")
+  (println *style*))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; harmony generation ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; returns the a random element according to weights in the cars of the alist
+(define biased-random
+  (lambda (alst)
+    (let* ((sum (foldl + 0 (map car alst)))
+           (current 0)
+           (step (map (lambda (a)
+                        (set! current (+ current (/ (car a) sum)))
+                        (cons current (cdr a)))
+                      alst))
+           (r (random)))
+      (cdr (cl:find-if (lambda (a) (> (car a) r)) step)))))
+
+;; returns the next chord according to `*style*`,
+;; picks random (matching if possible) progressions 
+(define next-chord
+  (let ((remaining '())
+        (cadr-matcher (lambda (sth)
+                        (lambda (elt)
+                          (equal? sth (cadr elt))))))
+    (lambda ()
+      ;; refill `remaining`
+      (cond ((null? remaining) ; empty? choose any progression
+             (set! remaining (biased-random *style*)))
+            ((null? (cdr remaining)) ; last chord? choose matching next progression
+             ;; only if matching progression available, else choose any in next step
+             (if (cl:find-if (cadr-matcher (car remaining)) *style*)
+                 (set! remaining
+                       (biased-random (filter (cadr-matcher (car remaining)) *style*))))))
+      ;; pick next
+      (let ((next (car remaining)))
+        (set! remaining (cdr remaining))
+        next))))
+
+;;;;;;;;;;;;;;;
+;;;; drums ;;;;
+;;;;;;;;;;;;;;;
+
+(define swing-drums)
+(define start-swing-drums)
+(define stop-swing-drums)
+
+;; typical swing rhythm
+(let ((running #t))
+  (set! swing-drums
+        (lambda (beat)
+          (when running
+                (play-note (*metro* beat) drums *gm-ride* 60 (*metro* 'dur 2))
+                (play-note (*metro* (+ beat 1)) drums *gm-ride* 60 (*metro* 'dur 2))
+                (play-note (*metro* (+ beat 5/3)) drums *gm-ride* 60 (*metro* 'dur 2))
+                (play-note (*metro* (+ beat 1)) drums *gm-pedal-hi-hat* 80 (*metro* 'dur 1))
+                (callback (*metro* (+ beat 1.5)) 'swing-drums (+ beat 2)))))
+  (set! start-swing-drums
+        (lambda ()
+          (set! running #t)
+          (swing-drums (*metro* 'get-beat 2))))
+  (set! stop-swing-drums
+        (lambda () (set! running #f))))
+
+;;;;;;;;;;;;;;
+;;;; bass ;;;;
+;;;;;;;;;;;;;;
+
+;; determines the chance of a note to be played by the walking bass
+;; the chances don't sum up to 1, but this is scaled back by `biased-random`
+(define bass-note-chance
+  (lambda (last off chord)
+    (let ((new (+ last off)))
+      (cons (cond
+             ((> new 50) 0) ; too high
+             ((< new 30) 0) ; to low
+             (else (cond    ; additional rules
+                    ;; chord member? chance according to jump distance
+                    ((pc:? new chord) (/ 1 (abs off)))
+                    (else 0))))
+            new))))
+
+;; picks the next walking bass note according to current chord
+(define bass-pick-next
+  (let ((last 36))
+    (lambda (chord) 
+      (let ((chances '((0 . 0))))
+        ;; calculate chances for 2 octaves around the last
+        (dotimes (i 12)
+          (set! chances (cons (bass-note-chance last (+ 1 i) chord) chances))
+          (set! chances (cons (bass-note-chance last (- -1 i) chord) chances)))
+        ;; pick one, this returns the chosen note
+        (set! last (biased-random chances))))))
+
+;; plays one bar of walking bass according to chord
+(define bass-bar
+  (lambda (beat chord)
+    (let ((qlen (*metro* 'dur 1))
+          (elong (*metro* 'dur 2/3))
+          (eshort (*metro* 'dur 1/3)))
+      (dotimes (i 4)
+        (let ((time (*metro* (+ beat i))))
+          (case (biased-random '((4.0 . 1) (1.0 . 2)))
+            ((1)
+             (play-note time pizz-bass (bass-pick-next chord) 80 qlen))
+            ((2)
+             (play-note time pizz-bass (bass-pick-next chord) 80 elong)
+             (play-note (+ time elong) pizz-bass (bass-pick-next chord) 100 eshort))))))))
+
+;;;;;;;;;;;;;;;
+;;;; piano ;;;;
+;;;;;;;;;;;;;;;
+
+;; picks a random rhythm for one bar of piano voicings
+(define (random-piano-pattern notep longp)
+  (let ((beats))
+    (dotimes (i 4)
+      (if (< (random) notep) (set! beats (cons i beats)))
+      (if (< (random) notep) (set! beats (cons (+ i 2/3) beats))))
+    (let assign-length ((beats (reverse beats)))
+      (if (null? beats)
+          ()
+          (cons (if (and (not (null? (cdr beats)))
+                         (or (< (random) longp)
+                             (< (- (cadr beats) (car beats)) 1)))
+                    (cons (car beats) (- (cadr beats) (car beats))) ; long note
+                    (cons (car beats) 1/3))
+                (assign-length (cdr beats)))))))
+
+;; plays one bar of piano voicings
+(define (piano-bar beat chord)
+  (let ((notes (pc:make-chord 60 80 4 chord))
+        (pattern (random-piano-pattern 0.2 1.0)))
+    (for-each (lambda (event)
+                (let ((time (*metro* (+ beat (car event))))
+                      (dur (*metro* 'dur (cdr event))))
+                  (for-each (lambda (note)
+                              (play-note time piano note 80 dur))
+                            notes)))
+              pattern)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; harmony playback ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define harmony-loop)
+(define start-harmony-loop)
+(define stop-harmony-loop)
+
+(let ((running #t))
+  ;; creates bass and piano for one bar in a loop
+  (set! harmony-loop
+        (lambda (beat)
+          (when running
+                (let ((next-chord (next-chord)))
+                  (bass-bar beat next-chord)
+                  (piano-bar beat next-chord))
+                (callback (*metro* (+ beat 3)) 'harmony-loop (+ beat 4)))))
+  
+  ;; starts the harmony loop
+  (set! start-harmony-loop
+        (lambda ()
+          (set! running #t)
+          (harmony-loop (*metro* 'get-beat 4))))
+  
+  ;; stops the harmony loop
+  (set! stop-harmony-loop
+        (lambda ()
+          (set! running #f))))
+
+;;;;;;;;;;;;;;;;;
+;;;; control ;;;;
+;;;;;;;;;;;;;;;;;
+
+;; load a style
+(load-style "/home/chfin/Uni/ws1415/harm/repo/dummy_style.json")
+
+;; dsp control
+(mute)
+(unmute)
+
+;; set tempo
+(*metro* 'set-tempo 120)
+
+;; drum control
+(stop-swing-drums)
+(start-swing-drums)
+
+;; harmony control
+(stop-harmony-loop)
+(start-harmony-loop)
