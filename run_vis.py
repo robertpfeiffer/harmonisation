@@ -14,6 +14,7 @@ chordlist = []
 for prog in style.progressions:
     for c in prog.chords:
         chordlist.append(c.get_notes())
+    chordlist.append([])
 print chordlist
 #open file the xml in wrote to
 outfile = open(outpath, "w")

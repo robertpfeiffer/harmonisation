@@ -62,6 +62,9 @@ class Visualizer(object):
     def write_musicxml(self,chordlist):
         s = stream.Stream()
         for c in chordlist:
-            s.append(chord.Chord(c))
+            if c == []:
+                s.append(note.Rest())
+            else:
+                s.append(chord.Chord(c))
         xml = musicxml.m21ToString.fromStream(s)
         return xml
