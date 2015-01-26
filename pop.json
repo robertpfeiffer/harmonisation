@@ -1,0 +1,75 @@
+{
+    "name": "Pop Style",
+    "description": "This stye in inspired by a statistical analysis of pop songs",
+    "progressions": [
+        {
+          "description" : "Most popular progression I->V->vi->IV often for artistic reason I is skipped",
+          "weight": 100,
+          "chords": [
+            [0,4,7],
+            [7,11,2],
+            [9,0,4],
+            [5,9,0]
+          ]
+        }, {
+            "description" : "I->IV->I->IV",
+            "weight": 95,
+            "chords": [
+              [0,4,7],
+              [5,9,0],
+              [0,4,7],
+              [5,9,0]
+          ]
+        },
+        {
+          "description" : "I->vi->IV->V",
+          "weight": 90,
+          "chords": [
+            [0,4,7],
+            [9,0,4],
+            [5,9,0],
+            [7,11,2]
+          ]
+        },
+        {
+          "description" : "iii->IV->V->vi",
+          "weight": 90,
+          "chords": [
+            [7,11,4],
+            [5,9,0],
+            [7,11,2],
+            [9,0,4]
+          ]
+        },
+        {
+            "description" : "G->?",
+            "weight": 73,
+            "chords": [
+                [7,11,2],
+                [0,4,7]
+            ]
+        },
+        {
+            "description" : "F->?",
+            "weight": 73,
+            "chords": [
+                [5,9,0],
+                [2,7,11]
+            ]
+        }, {
+           "description" : "C->?",
+           "weight": 68,
+           "chords": [
+                [0,4,7],
+                [2,7,11]
+            ]
+        }, {
+           "description" : "am->?",
+           "weight": 56,
+           "chords": [
+                [9,0,4],
+                [2,7,11]
+              ]
+        }
+    ]
+}
