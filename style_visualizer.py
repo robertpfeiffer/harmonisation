@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from harmstyle import HarmonicStyle, ChordProgression, Chord
+
+from music21 import *
 
 
 class Visualizer(object):
@@ -17,7 +18,7 @@ class Visualizer(object):
         return literals
 
 
-    def visualize(self, st_dat):
+    def print_visualization(self, st_dat):
         print "==========================="
         print "==========================="
         print "Name: \t\t\t" + st_dat.name
@@ -56,3 +57,14 @@ class Visualizer(object):
                     ls.remove(j)
                     break
             print ""
+
+
+    def write_musicxml(self,chordlist):
+        s = stream.Stream()
+        for c in chordlist:
+            if c == []:
+                s.append(note.Rest())
+            else:
+                s.append(chord.Chord(c))
+        xml = musicxml.m21ToString.fromStream(s)
+        return xml

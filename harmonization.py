@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
+
+# http://networkx.github.io/documentation/networkx-1.9.1/
 import networkx as nx
+import pprint
 
 class Harmonization(object):
 
-    def harmonize(self, harm_style, melody, keynote, octave):
+    # TODO: implement all_paths = True
+    def harmonize(self, harm_style, melody, keynote, octave, all_paths=False):
         """
         Harmonization method, takes an harmonic style, the melody wrt. the keynote, the keynote and the octave (0-7 on a piano)
-        uses http://networkx.github.io/documentation/networkx-1.9.1/
+        Returns a list of Chords.
         """
         
         fitting_progressions = []
+        max_weight = 0
         
         """ Collect all correct progressions for each note """
         for i, note in enumerate(melody):
@@ -23,6 +28,8 @@ class Harmonization(object):
                         break
                 else:
                     fitting_progressions[i].append(progression)
+                    if progression.weight > max_weight:
+                        max_weight = progression.weight
                     
         """ Debugging stuff """
 #        for ix, x in enumerate(fitting_progressions):
@@ -30,10 +37,8 @@ class Harmonization(object):
 #            for iy, y in enumerate(fitting_progressions[ix]):
 #                for c in y.chords:
 #                    print(c.get_notes())
-                    
-#       Probably need: http://networkx.github.io/documentation/networkx-1.9.1/reference/classes.multidigraph.html#networkx.MultiDiGraph
-#       TODO use MultiDiGraph = multiple edges can connect two nodes to prevent jumping between progressions, but not many algorithms well defined
-        G = nx.DiGraph()
+        
+        G = nx.DiGraph() if not all_paths else nx.MultiDiGraph()
         
         """ Build graph from progressions """
         for ix, x in enumerate(fitting_progressions):
@@ -41,20 +46,45 @@ class Harmonization(object):
                 progression = fitting_progressions[ix][iy]
                 first_chord = progression.chords[0]
                 last_chord = progression.chords[-1]
-                if ix is len(melody):
-#                    G.add_edge("START", "END")
-#                    TODO connect to end node
-                    pass
-                else:
-                    t1 = (tuple(first_chord.get_notes()), ix)
-                    t2 = (tuple(last_chord.get_notes()), ix+len(progression.chords)-1)
+
+                t1 = (tuple(first_chord.get_notes()), ix)
+                t2 = (tuple(last_chord.get_notes()), ix+len(progression.chords)-1)
+                
+                if ix is 0:
+                    G.add_edge("START", t1)
+
+                # Add edge if we have a multigraph, the nodes or the edge don't exist yet or the existing edge has a higher weight
+                if (all_paths or \
+                    not G.has_node(t1) or \
+                    not G.has_node(t2) or \
+                    not G.has_edge(t1,t2) or \
+                    G[t1][t2]['weight'] > max_weight-progression.weight):
+                        G.add_edge(t1, t2, weight=max_weight-progression.weight, prog=progression)    
+                
+                
+                if ix+len(progression.chords) is len(melody):
+                    G.add_edge(t2, "END")
                     
-                    if ix is 0:
-                        G.add_edge("START", t1)
-                    
-                    G.add_edge(t1, t2, weight=progression.weight, object=progression)
-                    
-#       TODO remove too long paths
-#       TODO prune graph
-#       TODO find path of maximum weights -> implement viterbi? http://en.wikipedia.org/wiki/Viterbi_algorithm 
+        # Drawing the graph
         nx.draw_networkx(G)
+        
+        # This is where the magic happens    
+        length,path = nx.bidirectional_dijkstra(G,"START","END")
+        
+        # Get edges from node path
+        last_node = path[1]
+        path_trimmed = path[2:-1]
+        harmonies = []
+        for ix, x in enumerate(path_trimmed):
+            current_node = path_trimmed[ix]
+            chords = G[last_node][current_node]['prog'].chords
+            
+            if ix is 0:
+                harmonies.extend(chords)
+            else:
+                harmonies.extend(chords[1:])
+            
+            last_node = path_trimmed[ix]
+        
+        pprint.pprint(harmonies)
+        return harmonies
