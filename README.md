@@ -56,9 +56,17 @@ Creativities can be run using [develop.py](develop.py).
 
     python3 develop.py basic_style.json output_style.json CreativityClass
 
-`CreativityClass` stands for the actual class the creativity is implemented in, e.g., `RandomCreativity` (cf. the respective files in the plugin folder).
+`CreativityClass` stands for the actual class the creativity is implemented in, e.g., `SimpleCreativity` (cf. the respective files in the plugin folder).
 
-TODO add more here:
+The Harmonizer can be run with
+
+    python3 harmonization.py style.json output.json "<melody>"
+
+where `<melody>` is given as a json list of pitch classes, e.g. `[4,4,5,7,7,5,4,2,0,0,2,4,4,2,2]`.
+Don't forget to wrap the list in `""`, otherwise the shell will probably interpret the square brackets differently.
+
+An example of both can be seen in (and run from) `run_example.sh`.
+
+**TODO** add more here:
 
 - Vizualizer
-- Harmonizer
