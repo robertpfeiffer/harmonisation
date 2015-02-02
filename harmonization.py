@@ -2,7 +2,8 @@
 
 # http://networkx.github.io/documentation/networkx-1.9.1/
 import networkx as nx
-import pprint
+import pprint, sys, json
+from harmstyleio import HarmonicStyleIO
 
 class Harmonization(object):
 
@@ -66,7 +67,7 @@ class Harmonization(object):
                     G.add_edge(t2, "END")
                     
         # Drawing the graph
-        nx.draw_networkx(G)
+        # nx.draw_networkx(G)
         
         # This is where the magic happens    
         length,path = nx.bidirectional_dijkstra(G,"START","END")
@@ -88,3 +89,14 @@ class Harmonization(object):
         
         pprint.pprint(harmonies)
         return harmonies
+
+# currently simplified for testing:
+# $ python3 harmonization.py style.json harmonization.json [7,4,4,5,2,2,0,2,4,5,7,7,7]
+if __name__ == "__main__":
+    style = HarmonicStyleIO.harmonic_style_from_JSON_file(sys.argv[1])
+    melody = json.loads(sys.argv[3])
+    h = Harmonization()
+    chords = h.harmonize(style, melody, 0, 0)
+    harm = {"melody": melody, "chords": [c.get_notes() for c in chords]}
+    with open(sys.argv[2], "w") as out_file:
+        json.dump(harm, out_file)
