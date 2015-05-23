@@ -1,0 +1,71 @@
+* Creativity
+
+** Random
+- Parameters: standard deviation factor f_σ, flip chance p
+- keeps all progressions, weights are changed according to normal distribution:
+  - w_new ~ N(w_old, (w_old*f_σ)^2)
+- each chord in every progression is randomized:
+  - each note (pitch class) flips with a probability of p
+
+** Simple
+- Parameters: as above + similarity threshold and plausibility threshold
+- "novelty" and "quality" in two steps:
+  - generating ideas (brainstorming)
+  - selecting and combining "good" ideas (selection)
+- brainstorming: create partial progressions with different techniques
+  - single chords: create random new chords from existing (same as for "random creativity")
+  - progressions: split randomly into parts (allows recombination)
+- selection: take ideas and make new progressions
+  - substitution:
+    - find new chords in ideas that are similar to old chords -> substitution candidate (pairs)
+    - find candidates in old progressions
+    - compute "plausibility" of substitution in context
+    - if high enough, substitute
+  - plausibility:
+    - similarity with falling 5th (transpose first chord 5th down, compare with second chord)
+    - stepwise movements of single notes
+  - not implemented:
+    - combining partial progressions from the ideas to new progressions
+
+** Further ideas
+- process:
+  - strict distinction between brainstorming and selection?
+  - feedback between phases?
+  - include models of other musical parameters than harmonization to support creation/selection
+- creation of ideas:
+  - already use heuristics towards "good" ideas, or completely unbiased?
+  - structure of "ideas" (here partial progressions, could be different)
+- selection of "good" ideas
+  - include more advanced psychoacoustic models
+  - model "emotional response"
+  - set ideas into context, e.g., harmonize simple melodies on the fly to test ideas
+
+* Tools
+
+- Musescore
+  - score editor
+  - can display and play sheet music (e.g. musicxml)
+  - harmonizer as plugin?
+- Lilypond
+  - music typesetter (similar to LaTeX)
+  - can be used to create visual output programmatically
+- Music21 (Bob?)
+  - python framework + annotated music corpora
+  - can be used for programmatic music analysis (e.g. extracting styles from corpora)
+  - ...?
+- Extempore
+  - livecoding environment
+  - programmatically create music (sound) with scheme
+  - used as one possibility to "play" styles
+
+* Limitations of the approach
+
+- limited to harmony
+  - harmony is rarely independent
+  - often results from / influenced by other musical parameters
+  - developed further on a large scale
+  - good to model creativity?
+- limited to "harmonic styles"
+  - cannot express relation between harmony and other parameters
+  - very general/abstract model (e.g. no bass notes / inversions / counterpoint rules)
+  - good model for harmonization?
