@@ -1,3 +1,27 @@
 % TBD by Wolfgang
 \section{Style Viewers} 
+As we have shown earlier, the style views are the essence of the creative process so it's worth looking at this in its' raw form. That's why we included some style viewer in to project to apply to this task. In this section we introduce them.
+
+\subsection{Text Based viewer}
+As discussed earlier the styles are saved in a JSON file. Also these are made to intellectual by humans we thought of a more pleasant way to view the style wile developing. So we gave the style objects a print method. This method will print the style onto the current output of your python session. As seen in figure ??
+
+%insert figure here
+
+This figure shows the dummy style. The viewers orders the all the style sequences according to there likelihood, starting with the most likely.  It also translates our numeric representation into a tonal representation for a given key (default key is C major).
+
+That way one can easy see what the style will look like and if after applying the creative module, odd thing happened to the style, that would be harder to spot after the actual harmonizer. 
+
+\subsection{MusicXML Creator}
+Also fast and more visual would be to translate the style into a musicXML file and view it with your favorite musicXML viewer. We used MuseScore for that purpose. 
+
+%insert figure
+
+As seen in figure ? we did it for the dummy style. To do that we used the $to_musicxml$ method of the styles. It dose the same thing as the print method, that it orders the chore sequences starting with the most likely. But instead of printing it to the output it creates the musicxml file. For convince we defined a bunch of default values., that are: key is C major, duration if a tone is quarter pitch, as well as we use a four quarters rhythm. After every sequence we inserted a quarter break to indicate the end of a harmonization sequence.
+
+With this visualization you have the major advantage that now you have standardized data structure and you are able to process them farther. But mainly you want to show it in a score notation or listen to your creation.
+
+This is where this ends, because now we have a wildly compatible format that can be used in to do any more complicated things you may want to do. 
+
+
+
 In this section we explain the style viewer...
