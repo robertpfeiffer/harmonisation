@@ -1,0 +1,81 @@
+\section{Creativity}
+
+The creativity module is used to develop a new harmonic style from a given harmonic style in a possibly creative way.
+While the input and output are always both style descriptions, each implementation of this module can have additional parameters that influence the derivation of the new style from the old one.
+There are currently two implementations of this module, one that is completely random (\texttt{RandomCreativity}) and one that is a very simple collection of ideas that are related to creativity (\texttt{SimpleCreativity}).
+
+An implementation of the creativity module is a class that implements the method \texttt{develop}.
+This method takes as inputs a \texttt{HarmonicStyle} and two strings for the name and the description text of the output style.
+It then returns a new \texttt{HarmonicStyle}.
+Additional parameters can be given via the constructor of the class.
+
+\subsection{RandomCreativity}
+
+\texttt{RandomCreativity} takes two parameters in the constructor:
+A standard deviation factor $f_\sigma$ and a flip chance $p$.
+It takes the chords and progressions from the input style and randomizes them according to two rules:
+The wheight of each progression is updated randomly according to a normal distribution
+\[ w' \sim N(w, (w f_\sigma)^2)\]
+where $f_\sigma$ is the given standard deviation factor.
+Each chord in each progression is changed randomly flipping its notes where flipping means adding the note to the chord if it did not belong to the chord before or removing it from the chord if it did.
+For each possible note (0-11) a Bernuolli trial where the success probability is the flip chance $p$ is used to determine whether the note should be flipped.
+This implementation of the creativity module is just used as a dummy.
+
+\subsection{SimpleCreativity}
+
+\texttt{SimpleCreativity} tries to combine some general considerations about creativity with random variation.
+Intuitively, there are at least two requirements for calling something creative:
+It must be \emph{new} and in some sense \emph{good}.
+The first requirement seems to the more obvious one:
+Something that is just a copy of something that already existed before is not creative.
+While it can be (and probably in most cases is) based on something existing it must be different at least in some respect.
+In our case, it is relatively straightforward to find measures for the similarity or dissimilarity of chords or chord progressions, as they are very structured.
+For example, since a chord can be seen as a mapping from a pitch class (0-11) to a truth value (where true means that the chord contains the pitch and false that it does not), two chords can be compared by the places in which they differ.
+
+The second requirement might seem a bit surprising in the light of things like contemporary music and art, which might seem very unpleasant or ugly to some.
+But it is important that even in those cases there can be some kind of quality measure in the sense that there is a justification of the outcome and that it is not arbitrary.
+Even for a work in which randomness is used there is usually an idea behind it.
+For example, a piece of music that, as a result of bad composing, has arkward harmonic progressions and a strange melody is probably not very creative.
+On the other hand, a piece that is based on a complicated algorithm that determines its notes and that has been chosen for a very specific reason might be considered very creative although it does not sound very nice.
+
+The difficulcy lies in the quality measure itself, which is not fixed and usually not given beforehand.
+Therefore, we are in a dilemma between fixing a quality measure for our task, which might prohibit some outcomes that would be considered creative according to different quality criteria, and not fixing it, which basically leaves the task underspecified.
+We do not want to restrict creativity to things that sound pleasant, but we also want to distinguish between good and bad compositions.
+
+As a solution, one might go with mathematical and physical properties of the music itself and psychoacoustic phenomena that are shared by humans as guidelines for a very general but ridgid quality measure for the harmonic styles we have in mind.
+This is not the only possible solution since it prohibits certain types of creative music like the algorithmic composition in the example above, but it is practical if our goal is to find music that does not just copy what already exists but still sounds pleasant.
+
+The class \texttt{SimpleCreativity} is a first and very rough attempt to follow this idea.
+It splits the development of the new harmonic style into two phases: a generation phase and a selection phase.
+In the generation phase new musical material is generated in the form of fragments of chord progressions (i.e., chord progressions that contain few chords or even only a single chord).
+The selection phase tries to select the ``good'' material and to combine it to larger progressions according to some heuristics.
+
+The generation phase uses the same techniques as the \texttt{RandomCreativity} to generate new chords from the ones in the input style.
+Furthermore, it takes the given chord progressions and splits them randomly into smaller parts.
+This allows the existing progressions to be recombined in novel ways in the selection phase.
+
+The selection phase uses substition and concatenation to create new progressions from the existing progressions and the newly generated ideas.
+Substitution candidates are found by comparing the all new chords (i.e., those that are contained in the new ideas but not in the original style) to the old chords according to the similarity measure described above scaled to 1 (i.e., divided by 12).
+A threshold for the similarity of substitution pairs can be given to the constructor of \texttt{SimpleCreativity}.
+If the old chord of a substitution pair is found in one of the old progressions, the ``plausibility'' of substituting it with the new chord of the pair in that context is calculated based on the relation between the new chord and its neighbours in the progression.
+The relevant properties are the similarity of the latter chord to the falling fifth of the former chord and the stepwise movement of notes from one chord to another.
+If the plausibility is high enough (again, a threshold can be given via the constructor), the substitution is performed.
+
+Concatenation of fragments to larger progressions is currently not implemented.
+In the harmonization process, progressions are concatenated anyways, so the only reason to do this already at this point would be to give a certain combination a higher weight than the sum of the weight of its parts in order to prefer it to other possible combinations.
+However, we did not find a plausible criterion for when this should happen.
+
+\subsection{Further Ideas}
+
+It is questionable whether the distinction between generation and selection phase is a good idea.
+One could also think of a setting in which there is a feedback between both phases.
+Also, harmonic structure is usually not developed in isolation but in relation to other musical parameters depending on specific situations.
+Therefore it might be required to incorporate models of other musical parameters into the process.
+
+The generation phase is currently random and unbiased except for the structure of the input and output and the specific randomization method (i.e., what exactly is randomized and what not).
+A different possibility would be to already include heuristics with respect to the musical content of the ideas, i.e. to only generate ``good'' or at least promising ideas according to some quality measure.
+Also, the structure of the output of this phase as (possibly partial) chord progressions could be extended to allow other types of ``ideas'' that are, for example, parametric.
+
+The selection phase could be adapted to a more sophisticated and more general psychoacoustic model than the current ``falling-fifth-plus-stepwise-movement'' approach.
+Another possibility would be to put the generated ideas into a more general musical context, e.g., to generate melodies, harmonize them using different selection candidates and thus measuring the quality of the selection candidates.
+These two approaches could also be combined by applying the psychoacoustic model not to selection candidates but to the harmonizations generated from them.
