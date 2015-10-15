@@ -1,5 +1,5 @@
 \documentclass[a4paper,11pt, fleqn]{article}
-\usepackage[top=2cm, bottom=2cm]{geometry}
+%\usepackage[top=2cm, bottom=2cm]{geometry}
 
 \usepackage{color}
 \usepackage[latin1]{inputenc}
@@ -12,6 +12,10 @@
 % set font to Palatino
 \renewcommand*{\familydefault}{\rmdefault}
 \renewcommand*\rmdefault{ppl}
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+\usepackage[hidelinks]{hyperref}
 
 
 \date{\today}
@@ -32,7 +36,10 @@
 
 \include{Chapters/ch05_Style_viewer}
 
+\include{Chapters/ch06_tools}
+
 \include{Chapters/ch09_related_work}
 
+\printbibliography
 
 \end{document}

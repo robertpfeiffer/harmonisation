@@ -6,3 +6,4 @@
 .idea/*
 example_out.json
 example_harm.json
+*.aux

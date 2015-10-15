@@ -1,0 +1,38 @@
+\section{Additional Tools}
+\label{sec:tools}
+
+In this section we will list some additional tools that were used in the context of this project.
+
+\subsection{Extempore}
+\label{sec:tools.extempore}
+
+Extempore \cite{extempore} is a programming environment for live coding.
+It features a scheme interpreter and a just-in-time compiler for its own language xtlang, a low-level language with a lisp syntax.
+Scheme is usually used for application logic such as algorithmic composition or application control while xtlang allows to program the synthesis of sound, displaying of graphics, or other computations with real-time requirements.
+
+Sound is created by defining a dsp function which takes inputs like a time code, an input sample, and a channel and returns an output sample.
+The way in which the output sample is generated is left to the programmer and can include, for example, synthesis or sampling.
+Extempore's standard library provides help for the sound generation on the sample level as well as composition on the note level (scales, chords, etc.).
+One core idea of Extempore is the concept of temporal recursion: a function can schedule another call to itself at a later point in time creating a loop with exact timing that can be modified on the fly.
+
+In the context of this project, Extempore is used for making a style audible as described in Section \ref{sec:viewers.extempore}.
+
+\subsection{Music21}
+\label{sec:tools.music21}
+
+Music21 \cite{music21} is a Python library for the computational analysis of music.
+It includes a set of annotated corpora and analysis tools as well as general music theoretical utilities.
+Data from the corpora can be accessed as Python objects and transformed, manipulated, and analyzed in Python.
+The example style \texttt{coltrane.json} has been generated using Music21.
+
+\subsection{Lilypond}
+\label{sec:tools.lilypond}
+
+\textit{Is this used at all?}
+
+\subsection{Musescore}
+
+MuseScore \cite{musescore} is an open source music sheet editor.
+It can display and play sheet music and supports MusicXML and Lilypond formats.
+This project uses it to view and listen to MusicXML representations of styles.
+Another idea was to make the harmonizer available as a plugin in musescore.
