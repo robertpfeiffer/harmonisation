@@ -5,25 +5,29 @@ As we have shown earlier, the style views are the essence of the creative proces
 
 \subsection{Text Based viewer}
 \label{sec:viewers.text}
-As discussed earlier the styles are saved in a JSON file. Also these are made to intellectual by humans (???) we thought of a more pleasant way to view the style while developing. So we gave the style objects a print method. This method will print the style onto the current output of your python session, as can be seen in the figure below:
-
+As discussed earlier the styles are saved in a JSON file. Even thou this format is made to be readable by humans we thought of a more pleasant way to view the style while developing. So we gave the style objects a print method. This method will print the style onto the current output of your python session, as can be seen in the figure below:
+\begin{figure}[ht]
+\centring
 \includegraphics[scale=1]{Chapters/pic/text_print.png}
+\caption{A sample chord printed with the print method}
+\end{figure}
 
 This figure shows the dummy style. The viewer orders all the style sequences according to their likelihood, starting with the most likely.  It also translates our numeric representation into a tonal representation for a given key (default key is C major).
 
-That way one can easily see how the style will look like and if after applying the creative module an odd thing happened to the style, that would be harder to spot after the actual harmonizer. 
+That way we can easily see how the style will look like and if after applying the creative module an odd thing happened to the style, that would be harder to spot after the actual harmonizer. 
 
 \subsection{MusicXML Creator}
 \label{sec:viewers.musicxml}
 Also faster and more visual would be to translate the style into a musicXML file and view it with your favorite musicXML viewer. We used MuseScore for that purpose. 
 
+\begin{figure}[ht]
 \includegraphics[scale=.5]{Chapters/pic/xml_print.png}
+\caption{MusicXML of a sample style view with the MuseScore program}
+\end{figure}
 
-As seen in figure above we did it for the dummy style. To do that we used the $write_musicxml$ method of the visualizer. It does the same thing as the print method, that it orders the chord sequences starting with the most likely. But instead of printing it to the output it creates a musicxml file. For convenience we defined a bunch of default values, namely the key is C major, the duration of a tone is quarter pitch, as well as we use a four quarters rhythm. After every sequence we inserted a quarter break to indicate the end of a harmonization sequence.
+As seen in the figure above we used the write musicxml method of the visualizer. It does the same thing as the print method, that it orders the chord sequences starting with the most likely. But instead of printing it to the output it creates a musicxml file. For convenience we defined a bunch of default values, namely the key is C major, the duration of a tone is quarter pitch, as well as we use a four quarters rhythm. After every sequence we inserted a quarter break to indicate the end of a harmonization sequence.
 
 With this visualization you have the major advantage that now you have standardized data structure and you are able to process them further. But mainly you want to view it in a score notation or listen to your creation.
-
-This is where this ends, because now we have a wildly compatible format that can be used in to do any more complicated things you may want to do. 
 
 \subsection{Extempore}
 \label{sec:viewers.extempore}
