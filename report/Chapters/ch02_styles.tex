@@ -1,6 +1,6 @@
 
 \section{Style}
-Harmonic styles in the scope of this project are defined in terms of a name, a description and a list of weighted chord progressions (see Chords \& Progressions below). This is a strong simplification of the usual notion of a musical style, but thereby reduces complexity and allows formalization of an otherwise abstract concept.
+Harmonic styles in the scope of this project are defined in terms of a name, a description and a list of weighted chord progressions (see Chord Progressions below). This is a strong simplification of the usual notion of a musical style, but thereby reduces complexity and allows formalization of an otherwise abstract concept.
 
 Harmonic styles are implemented by the class HarmonicStyle, and specific manifestations are represented in terms of one JSON file (see JSON Format below) for each distinct style. With the help of static methods of the HarmonicStyleIO class, an instance of HarmonicStyle can be created from or serialized into a JSON file.
 
@@ -12,8 +12,10 @@ Actual chords can be obtained from these descriptions by defining a reference no
 Each chord progression in a harmonic style, characterized by its list of notes, additionally holds a weight. Its weight indicates how much it is preferred over other chord progressions, or specify the relative frequency of this progression in harmonizations developed from the harmonic style. These weights can be any number, but have to be consistent within the same harmonic style.
 
 \subsection{JSON Format}
-The JSON (short for: JavaScript Object Notation) http://tools.ietf.org/html/rfc7159 format is a light-weight, language-independent notation for data exchange, often used in client-server-applications. Data in the JSON format consists of attribute-value pairs and can therefore easily translated into associative arrays (e.g. dictionaries in Python). Utilization of this format has many advantages: It is human-readable and is used by many computer programs and web-applications. Therefore, by using the JSON format, we can make use of the libraries and interfaces programming languages and other software (e.g. Music21) provides. An example of a chord progression defined in JSON format can be seen in Fig. X.
+The JSON (short for: JavaScript Object Notation) format\footnote{http://tools.ietf.org/html/rfc7159} is a light-weight, language-independent notation for data exchange, often used in client-server-applications. Data in the JSON format consists of attribute-value pairs and can therefore easily translated into associative arrays (e.g. dictionaries in Python). Utilization of this format has many advantages: It is human-readable and is used by many computer programs and web-applications. Therefore, by using the JSON format, we can make use of the libraries and interfaces programming languages and other software (e.g. Music21) provides. An example of a chord progression defined in JSON format can be seen in Fig. \ref{fig:jsonex}.
 
+\begin{figure}
+\centering
 \begin{verbatim}
 {
 	"description" : "T->T",
@@ -24,3 +26,6 @@ The JSON (short for: JavaScript Object Notation) http://tools.ietf.org/html/rfc7
            ]
 }
 \end{verbatim}
+\caption{Example of a progression defined in JSON}
+\label{fig:jsonex}
+\end{figure}
