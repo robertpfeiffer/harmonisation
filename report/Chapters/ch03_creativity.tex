@@ -1,4 +1,4 @@
-\section{Creativity}
+\subsection{Creativity}
 
 The creativity module is used to develop a new harmonic style from a given harmonic style in a possibly creative way.
 While the input and output are always both style descriptions, each implementation of this module can have additional parameters that influence the derivation of the new style from the old one.
@@ -9,7 +9,7 @@ This method takes as inputs a \texttt{HarmonicStyle} and two strings for the nam
 It then returns a new \texttt{HarmonicStyle}.
 Additional parameters can be given via the constructor of the class.
 
-\subsection{RandomCreativity}
+\subsubsection{RandomCreativity}
 
 \texttt{RandomCreativity} takes two parameters in the constructor:
 A standard deviation factor $f_\sigma$ and a flip chance $p$.
@@ -21,7 +21,7 @@ Each chord in each progression is changed randomly flipping its notes where flip
 For each possible note (0-11) a Bernuolli trial where the success probability is the flip chance $p$ is used to determine whether the note should be flipped.
 This implementation of the creativity module is just used as a dummy.
 
-\subsection{SimpleCreativity}
+\subsubsection{SimpleCreativity}
 
 \texttt{SimpleCreativity} tries to combine some general considerations about creativity with random variation.
 Intuitively, there are at least two requirements for calling something creative:
@@ -65,7 +65,7 @@ Concatenation of fragments to larger progressions is currently not implemented.
 In the harmonization process, progressions are concatenated anyways, so the only reason to do this already at this point would be to give a certain combination a higher weight than the sum of the weight of its parts in order to prefer it to other possible combinations.
 However, we did not find a plausible criterion for when this should happen.
 
-\subsection{Further Ideas}
+\subsubsection{Further Ideas}
 
 It is questionable whether the distinction between generation and selection phase is a good idea.
 One could also think of a setting in which there is a feedback between both phases.
