@@ -32,4 +32,22 @@ With this visualization you have the major advantage that now you have standardi
 \subsection{Extempore}
 \label{sec:viewers.extempore}
 
-TODO: Christoph (see also Section \ref{sec:tools.extempore})
+Finally, the best way to get an intuitive impression of a style is to listen to it.
+This is the purpose of the Extempore (cf. \ref{sec:tools.extempore}) based style ``viewer'', which takes the chord progressions from a style description and plays a continuous stream of chords based on these progressions.
+The next progression is determined by selecting all progressions that start with the last chord of the current progression and choosing randomly with a bias according to the progressions' weights.
+If no matching progression is available, the system chooses from all progressions.
+
+The playback is done by a simple simulation of a jazz trio, i.e., a bass, a drum set, and a piano.
+Each chord is played for one bar (four beats) and all instruments are based on prerecorded samples. The drums play a fixed simple swing rhythm that repeats every two beats.
+
+The bass simulates a walking bass and plays either one note per beat or in some cases randomly two swing eights per beat.
+The next note is chosen based on the previous note: within a range of two octaves around the previous note, each note that belongs to the current chord is given a weight which decreases with increasing distance to the previous note.
+Upper and lower limits are used to restrict the notes to an absolute range.
+The next note is then picked randomly with respect to the weights.
+
+The piano takes the current chord and picks four random notes that belong to the chord from a given range.
+This set of notes is then repeatedly played as a chord according to a randomly generated rhythm.
+The rhythm is determined by a coin flip for each eighth of a bar whether a note should start on it and an additional coin flip for each note whether it should be short (i.e., 1/3 beat = a short swing eighth) or long (i.e., until the next note starts).
+
+In its current form, this is not only a very subjective and intuitive approach to the evaluation of a style but is also biased by being fitted to simulating a typical style of jazz music.
+It might, however, be adapted to be more neutral.
