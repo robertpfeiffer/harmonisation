@@ -8,6 +8,7 @@
 %\usepackage[english]{babel} % is ja eigentlich alles auf englisch
 \usepackage{graphicx}
 \usepackage{floatflt, subcaption}
+\usepackage{newclude}
 
 % set font to Palatino
 \renewcommand*{\familydefault}{\rmdefault}
@@ -23,26 +24,30 @@
 
 \begin{document}
 
-\include{Chapters/ch00_Titlepage}
+\include*{Chapters/ch00_Titlepage}
 \tableofcontents 
 
-\include{Chapters/ch01_Introduction}
+\clearpage
+\include*{Chapters/ch01_Introduction}
 
+\clearpage
 \section{Implementation}
 
-\include{Chapters/ch02_styles}
+\include*{Chapters/ch02_styles}
 
-\include{Chapters/ch03_creativity}
+\include*{Chapters/ch03_creativity}
 
-\include{Chapters/ch04_harmonizer}
+\include*{Chapters/ch04_harmonizer}
 
-\include{Chapters/ch05_Style_viewer}
+\include*{Chapters/ch05_Style_viewer}
 
+\clearpage
 \section{Related Work}
 
-\include{Chapters/ch06_tools}
+\include*{Chapters/ch06_tools}
 
-\include{Chapters/ch07_limitations}
+\clearpage
+\include*{Chapters/ch07_limitations}
 
 \noindent
 Todo:\\
