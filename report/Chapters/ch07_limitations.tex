@@ -4,3 +4,27 @@
 
 \subsection{Limitations}
 
+For the purpose of harmonizing melodies, the presented approach has some limitations.
+The fundamental problem lies in the fact, that we already start with harmonies, which is a rather complex and abstract concept and in fact emerges from other musical properties like polyphony and voice leading.
+While considering progressions of harmonies might be a useful abstraction for analytic purposes, it can be doubted, whether it is equally helpful to the generation of interesting music, as it organizes what can be observed in existing music but does not reveal the underlying principles, at least not in the for that is used in our approach.
+
+This problem affects our approach in multiple ways.
+First of all, the actual harmonization is done only on the basis of the given harmonic style and is very simplistic.
+Voice leading is not taken into account at all since the output does not contain information about the actual instantiation of the chords.
+Also, other musical parameters like rhythm, form, or the position in the piece are ignored.
+
+Second, our harmonic style format is very inexpressive.
+Depending on the context, certain progressions might be preferred, in other situations they might even be forbidden.
+Since the weights of the progressions in a harmonic style are constant and context independent, our approach cannot account for this.
+
+Third, our harmonic styles are disadvantageous as objects for creativity.
+If human musical creativity is what we try to model, our model of developing harmonic styles is not very close to what humans actually do.
+The changes in the style of harmonization are a surface feature that arises from different underlying phenomena, some of which remain constant (e.g., voice leading, tension, and resolution) while others change over time (e.g., perception of dissonance).
+Since a harmonic style only contains the abstract information of harmonic patterns, the information that is needed for the actual underlying processes, is missing.
+
+All these problems arise because of the fact, that we operate on the abstract harmonic level while ignoring the actual underlying principles from which it emerges.
+An additional problem is that our model of harmony as chord progressions is very limited and is not actually able to encode harmonic information, i.e., which role a chord plays in a certain context.
+
+Finally, we took as an inspiration for our harmonic styles the different musical styles that developed over time.
+It is questionable, whether one can actually apply the concept of creativity (in the sense in which it is usually used for an individual agent) to this development or whether at most some kind of collective creativity in combination with social processes are more suitable here.
+Even if we would find a model for the development of musical styles, what would that tell us about the mechanisms of human creativity?
