@@ -41,6 +41,35 @@ Another idea was to make the harmonizer available as a plugin in MuseScore.
 
 \subsubsection{Rohrmeier}
 
+In \autocite{rohrmeier_towards_2011}, Rohrmeier presents a context free grammar for tonal harmony.
+It is intended to be generally applicable for western tonal music and is therefore designed to be independent from specific styles of western tonal music.
+Since its roots lie in Riemannian theory of harmony, the grammar distinguishes chords as tonic, dominant, and predominant (subdominant) related.
+The other fundamental idea, coming from Schenkerian music theory, is that harmony in this kind of music has a recursive structure:
+Some sequences of chords on the surface level can be seen as an elaboration of a single harmony on a more abstract, ``structural'' level.
+This idea is captured implicitly in the recursive nature of context free grammars and explicitly by distinguishing between functional regions (generating multiple chords) and actual functional harmonies (generating single chords or fixed length sequences of chords).
+
+The grammar is constructed according to multiple levels:
+The phrase level deals with single (harmonic) phrases or sequences of phrases.
+A single phrase is a well formed harmonic ``sentence'', which can be a whole piece.
+On the functional level phrases are composed of functional regions (in terms of tonic, dominant and subdominant), which are recursively composed out of other functional regions and ultimately functional harmonies.
+Functional harmonies are translated to scale degrees on the scale degree level (e.g. a dominant harmony generates a $V$ chord).
+The scale degree level also contains rules for secondary dominants and falling fifth sequences.
+Finally, scale degrees generate actual absolute chords using the current $key$ property on the structural level (e.g., $V$ becomes $C_{maj}$ if $key = F_{maj}$).
+
+The $key$ property is set in the top-level rule (phrase level) for the whole piece but can be modified on the functional level, as every functional harmony can generate a new functional region in which it is the local tonic (i.e., the $key$ is changed for all child nodes).
+This allows for several phenomena such as modulation and local tonicization.
+Additionally, a change of between major and minor is allowed at this point.
+
+The productions of the grammar are selected to stick to the basic principles of harmonic progression, i.e., a harmony may be prolonged, a dominant implies a tonic, and a subdominant implies a dominant.
+Implementing this in a context free grammar with its recursive structure implies that this holds not only for adjacent surface chords but for whole regions.
+Flexibility is then added by allowing modulations (as described above) and substitutions (e.g., the $tp$ might replace the $t$ function).
+This way, unusual jumps between adjacent chords can be explained by the fact that they belong to different subtrees, which have a simple relation on a higher level in the tree, which is in accordance with music theoretical interpretations.
+The sample analyses provided in the paper show that by relying on a very restricted set of basic principles this grammar can still account for very different harmonic phenomena from actual tonal music.
+
+The structural level is left unspecified in the paper, as it depends on the actual style of music and would be different, for example, for jazz as opposed to baroque music.
+Therefore, this approach addresses a different (but related) issue compared to ours.
+It aims at encoding the fundamental principles of western tonal music harmony as described by Riemannian functional harmony and the assumption of a recursive structure of harmony in a formal system (namely a context free grammar), thereby drawing a relation between music and language.
+
 \subsubsection{Koops - \textsc{HarmTrace}}
 The work by \cite{koops2012} is a model based system to derive harmonic functions of chords in their tonal context and consists of \textsc{HarmTrace} and the \textsc{HarmTrace Harmonizer}. It is a rule based system written in the programming language Haskell. Given a chord sequence \textsc{HarmTrace} derives the harmonic function of the of a chord in it's tonal context. It describes a grammar to represent chords and the relations between them in them. Based on this representation the \textsc{Harmonizer} creates the best fitting chord sequence to harmonize the melody.
 
@@ -72,3 +101,4 @@ Koops also uses the circle of fifths in combination with a stochastic selection 
 
 
   
+%  LocalWords:  tonicization
