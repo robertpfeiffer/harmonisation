@@ -20,9 +20,16 @@ In the context of this project, Extempore is used for making a style audible as 
 \subsubsection{Music21}
 \label{sec:tools.music21}
 
-Music21 \cite{music21} is a Python library for the computational analysis of music.
-It includes a set of annotated corpora and analysis tools as well as general music theoretical utilities.
-Data from the corpora can be accessed as Python objects and transformed, manipulated, and analyzed in Python.
+Music21 \cite{music21} is a Python library for the computational analysis of music. It includes a set of annotated corpora and analysis tools as well as general music theoretical utilities. Data from the corpora can be accessed as Python objects and transformed, manipulated, and analyzed in Python.
+
+Music21 represents musical scores in data structures that mimic sheet music. Each voice, bar, chord, and note is represented by a corresponding python object. Chords can be queried for their root, inversions, whether they are in major mode, and many other properties useful for automatic harmonization. Equally useful for automatic harmonization is the \texttt{chordify()} method, which converts a score with many voices into a stream of chords.
+
+Rich representation makes automated functional analysis possible and enables re-writing of voices into different keys or scales. The complex representation comes at a cost: Most music formats, even symbolic ones like MIDI, do not contain the data necessary for Music21's analysis: Time signatures, bars, scales, clefs and different voices are not strictly necessary to play back music and thus usually not included. MusicXML and MuseScore file formats represent a complete musical score in a machine-readable format. The Music21 corpus consists mainly of fully annotated MusicXML files.
+
+%MIDI describes sound of musical pieces through the onset, duration, pitch and volume the every note. 
+
+Music21 can generate MIDI and LilyPond files on the fly, so music processed by music21 can be played back or displayed as sheet music to be examined interactively during programming.
+
 The example style \texttt{coltrane.json} has been generated using Music21.
 
 \subsubsection{Musescore}
@@ -33,6 +40,24 @@ This project uses it to view and listen to MusicXML representations of styles.
 Another idea was to make the harmonizer available as a plugin in MuseScore.
 
 \subsection{Related Research}
+
+\subsubsection{Cope - Gradus}
+The \emph{Gradus} system by David Cope, as described in \cite{cope2004musical}, is an early example of algorithmic harmonization. Gradus can produce counterpoint by constructing a second voice that harmonizes with a given first voice called \emph{cantus firmus}.
+
+\paragraph{Algorithm} 
+The Gradus algorithm incrementally constructs this second voice according to a set of heuristics and constraints. During each iteration, it evaluates the generated voice against the constraints and back-tracks if necessary. By default, Gradus comes with a set of constraints for the composition of first-species counterpoint, adapted from \cite{fux1742gradus}. During the harmonization process, Gradus keeps track of patterns that lead to backtracking and dead ends. Over time, it learns to avoid these patterns, and minimizes the amount of backtracking. Given a corpus of counterpoint music as additional training data, Gradus will first analyze and find patterns in it in the manner described above, before creating counterpoint from the given \emph{cantus firmus}.
+
+\paragraph{Limitations} 
+Writing counterpoint is an task Cope himself and many students of composition have undertaken as an exercise. Cope modeled Gradus on the way he himself approached this exercise, through introspection. Gradus is not meant to produce creative musical harmonizations, but to be a cognitively plausible model of counterpoint composition.
+
+\subsubsection{Microsoft Research Songsmith}
+Microsoft Songsmith \cite{simon2008mysong} is an end-user-focused system for automatic harmonization. Unlike the other systems discussed here, Songsmith operates on sound sound data: The user enters the melody to be harmonized by singing directly into the computer microphone.
+
+Microsoft Songsmith uses a Hidden Markov Model of chord progressions in order to generate a harmonic accompaniment to the input melody. The chord progressions form the sequence of hidden states to be induced, while the input melody forms the sequence of observed visible states. Songsmith induces the conditional transition probability $P(C_A(t+1)|C_b(t))$ of chord $C_A$ following after $C_b$ and the observation probability $P(M(t)|C(t))$ of a melody given the accompanying chord from a corpus of pop music. The corpus is split into ``happy'' and ``sad'' songs, leading to two different generative models for different moods.
+
+Songsmith infers the ``most likely'' harmonization of a melody given this model\footnote{The Viterbi Algorithm calculates the most likely sequence of hidden states to produce a sequence of observations in a Hidden Markov Model}. The user interface exposes ``happiness'' and ``jazziness'' parameters, which govern the interpolation of the generative model between happy and sad moods and the relative importance of matching chords to the melody versus sticking to known chord progressions. Finally, Songsmith uses a software synthesizer to create the sound of the accompaniment and superimposes it over the sung input melody.
+
+Of all the harmonization systems discussed here, Songsmith is the most data-driven and the least rule-based. The transition probabilities used by Songsmith have little exploitable structure. It is unclear as how to generate new musical styles based on existing transition probabilities. Songsmith models chords as atomic symbols, ignoring all structure and relations between scales and chord progressions.
 
 \subsubsection{Rohrmeier}
 
