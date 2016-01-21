@@ -14,11 +14,11 @@ Additional parameters can be given via the constructor of the class.
 \texttt{RandomCreativity} takes two parameters in the constructor:
 A standard deviation factor $f_\sigma$ and a flip chance $p$.
 It takes the chords and progressions from the input style and randomizes them according to two rules:
-The wheight of each progression is updated randomly according to a normal distribution
+The weight of each progression is updated randomly according to a normal distribution
 \[ w' \sim N(w, (w f_\sigma)^2)\]
 where $f_\sigma$ is the given standard deviation factor.
 Each chord in each progression is changed randomly flipping its notes where flipping means adding the note to the chord if it did not belong to the chord before or removing it from the chord if it did.
-For each possible note (0-11) a Bernuolli trial where the success probability is the flip chance $p$ is used to determine whether the note should be flipped.
+For each possible note (0-11) a Bernoulli trial where the success probability is the flip chance $p$ is used to determine whether the note should be flipped.
 This implementation of the creativity module is just used as a dummy.
 
 \subsubsection{SimpleCreativity}
@@ -35,14 +35,14 @@ For example, since a chord can be seen as a mapping from a pitch class (0-11) to
 The second requirement might seem a bit surprising in the light of things like contemporary music and art, which might seem very unpleasant or ugly to some.
 But it is important that even in those cases there can be some kind of quality measure in the sense that there is a justification of the outcome and that it is not arbitrary.
 Even for a work in which randomness is used there is usually an idea behind it.
-For example, a piece of music that, as a result of bad composing, has arkward harmonic progressions and a strange melody is probably not very creative.
+For example, a piece of music that, as a result of bad composing, has awkward harmonic progressions and a strange melody is probably not very creative.
 On the other hand, a piece that is based on a complicated algorithm that determines its notes and that has been chosen for a very specific reason might be considered very creative although it does not sound very nice.
 
-The difficulcy lies in the quality measure itself, which is not fixed and usually not given beforehand.
+The difficulty lies in the quality measure itself, which is not fixed and usually not given beforehand.
 Therefore, we are in a dilemma between fixing a quality measure for our task, which might prohibit some outcomes that would be considered creative according to different quality criteria, and not fixing it, which basically leaves the task underspecified.
 We do not want to restrict creativity to things that sound pleasant, but we also want to distinguish between good and bad compositions.
 
-As a solution, one might go with mathematical and physical properties of the music itself and psychoacoustic phenomena that are shared by humans as guidelines for a very general but ridgid quality measure for the harmonic styles we have in mind.
+As a solution, one might go with mathematical and physical properties of the music itself and psychoacoustic phenomena that are shared by humans as guidelines for a very general but rigid quality measure for the harmonic styles we have in mind.
 This is not the only possible solution since it prohibits certain types of creative music like the algorithmic composition in the example above, but it is practical if our goal is to find music that does not just copy what already exists but still sounds pleasant.
 
 The class \texttt{SimpleCreativity} is a first and very rough attempt to follow this idea.
